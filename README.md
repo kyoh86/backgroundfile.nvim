@@ -1,3 +1,5 @@
+# This is alpha. It may be dropped without notice
+
 # backgroundfile.nvim
 
 A neovim lib-plugin to open a file in background (hidden floatwin).
