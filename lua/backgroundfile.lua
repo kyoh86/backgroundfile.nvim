@@ -6,7 +6,7 @@ local close_later_default_option = {
     timeout = 1000,
 }
 
----@alias Closer function
+---@alias backgroundfile.Closer fun(win:window) @Close the window
 
 ---Get a closer to close the floatwin later
 ---
@@ -15,7 +15,7 @@ local close_later_default_option = {
 ---           The last window of a buffer with unwritten changes can be closed.
 ---           The buffer will become hidden, even if 'hidden' is not set. defaults to true
 ---         - timeout (integer): Time in ms to wait before closing. defaults to 1000 (ms)
----@return Closer
+---@return backgroundfile.Closer
 function M.close_later(opts)
     local options = vim.tbl_extend("keep", opts or {}, close_later_default_option)
     return function(win)
@@ -33,7 +33,7 @@ end
 ---         - buffer (integer) optional: buffer number for buffer local autocommands |autocmd-buflocal|.
 ---           Cannot be used with {pattern}.
 ---         - nested (boolean) optional: defaults to false. Run nested autocommands |autocmd-nested|.
----@return Closer
+---@return backgroundfile.Closer
 function M.close_on_autocmd(event, opts)
     local options = vim.tbl_extend("keep", opts, {
         force = true,
@@ -47,7 +47,7 @@ function M.close_on_autocmd(event, opts)
     end
 end
 
----@type {listed: boolean, closer: Closer}
+---@type {listed: boolean, closer: backgroundfile.Closer}
 local open_default_option = {
     listed = true,
     closer = M.close_later(),
@@ -56,7 +56,7 @@ local open_default_option = {
 ---Open a file in background floatwin.
 ---
 ---@param path string @The path of the file to open.
----@param opts {listed: boolean, closer: Closer}? @Dictionary of options optional:
+---@param opts {listed: boolean, closer: backgroundfile.Closer}? @Dictionary of options optional:
 ---         - listed (boolean) optional: sets 'buflisted'. defaults to true
 ---         - closer (function) optional: a Lua function to close the floatwin. They accept a window-ID.
 ---           defaults to backgroundfile.close_later()
@@ -65,6 +65,7 @@ function M.open(path, opts)
     local options = vim.tbl_extend("keep", opts or {}, open_default_option)
 
     -- open deps.ts in background (floatwin)
+    --- @type window
     local win = vim.api.nvim_open_win(vim.api.nvim_create_buf(options.listed, false), false, {
         relative = "editor",
         width = 1,
